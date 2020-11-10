@@ -1,0 +1,100 @@
+---
+title: "R Shiny Presentation"
+author: "Lauren Yabuki"
+date: "10/11/2020"
+output: ioslides_presentation
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Shiny Presentation
+
+This R Markdown presentation is made interactive using Shiny according to Coursera assignment Shiny Application and Reproducible Pitch. 
+The data give the maximum daily temperature in degrees Fahrenheit at La Guardia Airpor from the data package airquality.
+
+## Course Project: Shiny Application
+
+1. Write a shiny application with associated supporting documentation. The documentation should be thought of as whatever a user will need to get started using your application.
+2. Deploy the application on Rstudio's shiny server
+3. Share the application link by pasting it into the provided text box
+4. Share your server.R and ui.R code on github
+
+## Course Project: Reproducible Pitch Presentation
+
+1. 5 slides to pitch our idea done in Slidify or Rstudio Presenter
+2. Your presentation pushed to github or Rpubs
+3. A link to your github or Rpubs presentation pasted into the provided text box: 
+https://github.com/laurenyabuki/Shiny-Application-and-Reproducible-Pitch.git
+https://laurenyabuki.shinyapps.io/Coursera_Project_Shiny_application/?_ga=2.176921644.8093120.1605043910-289867867.1605043910
+
+## Interactive Plot
+
+```{r airquality}
+library(shiny)
+data(airquality)
+
+# Define UI for app that draws a histogram ----
+ui <- fluidPage(
+  
+  # App title ----
+  titlePanel("Maximum daily temperature in degrees Fahrenheit at La Guardia Airport"),
+  
+  # Sidebar layout with input and output definitions ----
+  sidebarLayout(
+    
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+      
+      # Input: Slider for the number of bins ----
+      sliderInput(inputId = "bins",
+                  label = "Number of bins:",
+                  min = 50,
+                  max = 100,
+                  value = 20)
+      
+    ),
+    
+    # Main panel for displaying outputs ----
+    mainPanel(
+      
+      # Output: Histogram ----
+      plotOutput(outputId = "distPlot")
+      
+    )
+  )
+)
+inputPanel(
+  selectInput("n_breaks", label = "Number of bins:",
+              choices = c(10, 20, 35, 50), selected = 20),
+  
+  sliderInput("bw_adjust", label = "Bandwidth adjustment:",
+              min = 0.2, max = 2, value = 1, step = 0.2)
+)
+```
+
+```{r}
+# Define server logic required to draw a histogram ----
+server <- function(input, output) {
+  
+
+  output$distPlot <- renderPlot({
+    
+    x    <- airquality$Temp
+    x    <- na.omit(x)
+    bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    
+    hist(x, breaks = bins, col = "#75AADB", border = "black",
+         xlab = "Temperature",
+         main = "Histogram of Maximum Temperature")
+    
+  })
+}
+# Create Shiny app ----
+shinyApp(ui = ui, server = server)
+```
+
+
+
